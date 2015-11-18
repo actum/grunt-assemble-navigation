@@ -14,6 +14,9 @@ var path = require('path');
 var template = require('template');
 var cheerio = require('cheerio');
 var log = require('verbalize');
+var slugify = function(headerString) {
+  return headerString.replace(/ /g, '-').replace(/\./, '-').toLowerCase();
+}
 
 
 /**
@@ -29,6 +32,18 @@ module.exports = function (params, callback) {
 
   var anchorOpts = params.assemble.options.anchors || {};
   var navOpts = params.assemble.options.navigation || {};
+
+  // create the anchor id tags where not present
+  var he = $('h1,h2').map(function(i, e) {
+    var $e = $(e);
+    if ($e.attr('id')) {
+      return;
+    } else {
+      var text = $e.text().trim();
+      var id = slugify(text);
+      $e.attr('id', id);
+    }
+  });
 
   // get all the anchor tags from inside the headers
   var headings = $('h1[id],h2[id]');
